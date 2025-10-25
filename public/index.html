@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f4f6f8;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background: #0078d4;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .dashboard {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .card {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: 0.3s;
+    }
+
+    .card:hover {
+      background: #0078d4;
+      color: white;
+      transform: translateY(-5px);
+    }
+
+    canvas {
+      width: 100%;
+      height: 400px;
+    }
+
+    footer {
+      text-align: center;
+      color: #777;
+      padding: 20px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <header>📊 Admin Dashboard</header>
+
+  <div class="dashboard">
+    <div class="cards">
+      <div class="card" id="users">Users: --</div>
+      <div class="card" id="revenue">Revenue: --</div>
+      <div class="card" id="orders">Orders: --</div>
+      <div class="card" id="views">Views: --</div>
+    </div>
+
+    <canvas id="chart"></canvas>
+  </div>
+
+  <footer>© 2025 Admin Dashboard | Powered by Node.js, Express & MongoDB</footer>
+
+  <script>
+    const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4ZmI5M2RkOGVlYjI3MDdkNzUwNjhmZSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc2MTM2Nzc0NywiZXhwIjoxNzYxMzk2NTQ3fQ.FuwU_wEmpPESvAt3I4iIy8N3mzoH4wxSI5XysWoEaW0";
+
+    async function fetchData() {
+      const res = await fetch('/api/metrics', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const data = await res.json();
+
+      if (!data.ok) return alert('Error fetching data');
+
+      document.getElementById('users').innerText = 👥 Users: ${data.totals.users};
+      document.getElementById('revenue').innerText = 💰 Revenue: ${data.totals.revenue};
+      document.getElementById('orders').innerText = 🛒 Orders: ${data.totals.orders};
+      document.getElementById('views').innerText = 👁 Views: ${data.totals.views};
+
+      new Chart(document.getElementById('chart'), {
+        type: 'bar',
+        data: {
+          labels: ['Users', 'Orders', 'Views'],
+          datasets: [{
+            label: 'Metrics Overview',
+            data: [data.totals.users, data.totals.orders, data.totals.views],
+            backgroundColor: ['#0078d4', '#00bfa6', '#ffb020']
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    }
+
+    fetchData();
+    setInterval(fetchData, 30000);
+  </script>
+</body>
+</html>
